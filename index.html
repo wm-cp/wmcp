@@ -2,168 +2,20 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub 侧边栏导航</title>
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft Yahei", sans-serif;
-        }
-        body {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
-        .menu-btn {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 999;
-            font-size: 24px;
-            color: #fff;
-            background: #165DFF;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background: #165DFF;
-            color: #fff;
-            padding: 30px 20px;
-            transition: all 0.3s ease;
-            overflow-y: auto;
-        }
-        .sidebar h2 {
-            text-align: center;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-            letter-spacing: 2px;
-        }
-        .sidebar ul { list-style: none; }
-        .sidebar li { margin: 8px 0; }
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            color: #fff;
-            text-decoration: none;
-            font-size: 15px;
-            padding: 14px 18px;
-            border-radius: 8px;
-            transition: all 0.25s;
-            cursor: pointer;
-        }
-        .sidebar a i {
-            font-size: 18px;
-            margin-right: 12px;
-            width: 24px;
-            text-align: center;
-        }
-        .sidebar a:hover {
-            background: rgba(255,255,255,0.15);
-            transform: translateX(4px);
-        }
-        .sidebar a.active {
-            background: rgba(255,255,255,0.25);
-        }
-        .content {
-            margin-left: 260px;
-            padding: 40px 50px;
-            transition: all 0.3s ease;
-        }
-        .content-panel {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-        .content-panel.active { display: block; }
-        .content h1 {
-            color: #1d2129;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .content p {
-            color: #4e5969;
-            line-height: 1.8;
-            font-size: 16px;
-            margin: 10px 0;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 768px) {
-            .menu-btn { display: block; }
-            .sidebar { left: -260px; }
-            .sidebar.show { left: 0; }
-            .content { margin-left: 0; padding: 30px 20px; }
-        }
-    </style>
+    <title>模块化侧边栏页面</title>
 </head>
 <body>
 
-<div class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></div>
+<!-- 左侧导航模块 -->
+<link rel="html" href="sidebar.html">
+<object data="sidebar.html"></object>
 
-<div class="sidebar" id="sidebar">
-    <h2>导航菜单</h2>
-    <ul>
-        <li><a class="nav-item active" data-target="home"><i class="fas fa-home"></i> 首页</a></li>
-        <li><a class="nav-item" data-target="about"><i class="fas fa-user"></i> 关于我</a></li>
-        <li><a class="nav-item" data-target="project"><i class="fas fa-code"></i> 项目展示</a></li>
-        <li><a class="nav-item" data-target="blog"><i class="fas fa-book"></i> 技术博客</a></li>
-        <li><a class="nav-item" data-target="file"><i class="fas fa-folder"></i> 文件资源</a></li>
-        <li><a class="nav-item" data-target="contact"><i class="fas fa-envelope"></i> 联系我</a></li>
-    </ul>
-</div>
+<!-- 右侧内容模块 -->
+<link rel="html" href="content.html">
+<object data="content.html"></object>
 
-<div class="content">
-    <div class="content-panel active" id="home"><h1>首页</h1><p>欢迎来到我的主页</p></div>
-    <div class="content-panel" id="about"><h1>关于我</h1><p>个人介绍</p></div>
-    <div class="content-panel" id="project"><h1>项目</h1><p>项目展示</p></div>
-    <div class="content-panel" id="blog"><h1>博客</h1><p>技术文章</p></div>
-    <div class="content-panel" id="file"><h1>文件</h1><p>资源下载</p></div>
-    <div class="content-panel" id="contact"><h1>联系</h1><p>联系方式</p></div>
-</div>
+<!-- 交互逻辑 -->
+<script src="script.js"></script>
 
-<script>
-// ==========================================
-// 防查看代码：禁用右键 + F12 + 控制台调试
-// ==========================================
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&e.key==='I')||(e.ctrlKey&&e.key==='U')) e.preventDefault();
-});
-setInterval(()=>{debugger;},100);
-
-// 菜单切换逻辑
-const menuBtn = document.getElementById('menuBtn');
-const sidebar = document.getElementById('sidebar');
-menuBtn.addEventListener('click',()=>{sidebar.classList.toggle('show');});
-
-const navItems=document.querySelectorAll('.nav-item');
-const panels=document.querySelectorAll('.content-panel');
-navItems.forEach(item=>{
-  item.addEventListener('click',function(){
-    navItems.forEach(nav=>nav.classList.remove('active'));
-    this.classList.add('active');
-    const target=this.getAttribute('data-target');
-    panels.forEach(p=>p.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
-    if(window.innerWidth<=768) sidebar.classList.remove('show');
-  });
-});
-</script>
 </body>
 </html>
