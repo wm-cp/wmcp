@@ -3,111 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的 GitHub 页面</title>
+    <title>GitHub 侧边栏导航 - 内容切换</title>
+    <!-- 字体图标 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 全局样式重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: "Microsoft Yahei", sans-serif;
         }
-
-        /* 页面整体布局：左侧侧边栏 + 右侧内容 */
         body {
-            display: flex;
             min-height: 100vh;
+            background-color: #f8f9fa;
         }
 
-        /* ======================
-           左侧固定侧边栏导航
-        ====================== */
+        /* 移动端菜单按钮 */
+        .menu-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 999;
+            font-size: 24px;
+            color: #fff;
+            background: #165DFF;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 左侧侧边栏 */
         .sidebar {
-            width: 250px;           /* 侧边栏宽度 */
-            background: #2c3e50;     /* 侧边栏背景色（深色） */
-            color: white;
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #165DFF;
+            color: #fff;
             padding: 30px 20px;
-            position: fixed;         /* 固定在左侧不滚动 */
-            height: 100vh;           /* 高度占满屏幕 */
+            transition: all 0.3s ease;
+            overflow-y: auto;
         }
-
-        /* 侧边栏标题 */
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #555;
-            padding-bottom: 10px;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 2px;
         }
-
-        /* 导航菜单列表 */
         .sidebar ul {
             list-style: none;
         }
-
-        .sidebar ul li {
-            margin: 15px 0;
+        .sidebar li {
+            margin: 8px 0;
         }
-
-        /* 导航链接样式 */
-        .sidebar ul li a {
-            color: white;
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #fff;
             text-decoration: none;
-            font-size: 16px;
-            display: block;
-            padding: 10px;
-            border-radius: 4px;
-            transition: 0.3s;
+            font-size: 15px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            transition: all 0.25s;
+            cursor: pointer;
         }
-
-        /* 鼠标悬浮效果 */
-        .sidebar ul li a:hover {
-            background: #34495e;
-            padding-left: 15px;
-        }
-
-        /* ======================
-           右侧主内容区域
-        ====================== */
-        .content {
-            margin-left: 250px;       /* 避开左侧侧边栏 */
-            padding: 40px;
-            flex: 1;
-            background: #f5f5f5;
-        }
-
-        .content h1 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .content p {
+        .sidebar a i {
             font-size: 18px;
-            line-height: 1.6;
-            color: #555;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(4px);
+        }
+        .sidebar a.active {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* 主内容容器 */
+        .content {
+            margin-left: 260px;
+            padding: 40px 50px;
+            transition: all 0.3s ease;
+        }
+        /* 内容面板 默认隐藏 */
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        /* 激活的面板显示 */
+        .content-panel.active {
+            display: block;
+        }
+        .content h1 {
+            color: #1d2129;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .content p {
+            color: #4e5969;
+            line-height: 1.8;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: block;
+            }
+            .sidebar {
+                left: -260px;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .content {
+                margin-left: 0;
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 移动端展开按钮 -->
+    <div class="menu-btn" id="menuBtn">
+        <i class="fas fa-bars"></i>
+    </div>
 
-    <!-- 左侧侧边栏 -->
-    <div class="sidebar">
+    <!-- 左侧导航栏 -->
+    <div class="sidebar" id="sidebar">
         <h2>导航菜单</h2>
         <ul>
-            <li><a href="#home">首页</a></li>
-            <li><a href="#about">关于我</a></li>
-            <li><a href="#project">项目</a></li>
-            <li><a href="#blog">博客</a></li>
-            <li><a href="#contact">联系我</a></li>
+            <li><a class="nav-item active" data-target="home"><i class="fas fa-home"></i> 首页</a></li>
+            <li><a class="nav-item" data-target="about"><i class="fas fa-user"></i> 关于我</a></li>
+            <li><a class="nav-item" data-target="project"><i class="fas fa-code"></i> 项目展示</a></li>
+            <li><a class="nav-item" data-target="blog"><i class="fas fa-book"></i> 技术博客</a></li>
+            <li><a class="nav-item" data-target="file"><i class="fas fa-folder"></i> 文件资源</a></li>
+            <li><a class="nav-item" data-target="contact"><i class="fas fa-envelope"></i> 联系我</a></li>
         </ul>
     </div>
 
-    <!-- 右侧主内容 -->
+    <!-- 右侧内容区域（多个切换面板） -->
     <div class="content">
-        <h1>欢迎来到我的 GitHub Pages 页面</h1>
-        <p>这里是主内容区域，左侧已经成功添加了固定侧边栏导航~</p>
-        <br>
-        <p>你可以自由修改导航菜单、颜色、文字和内容。</p>
+        <!-- 首页面板 -->
+        <div class="content-panel active" id="home">
+            <h1>首页</h1>
+            <p>欢迎来到我的 GitHub 个人主页！</p>
+            <p>点击左侧导航菜单，即可切换不同内容窗口。</p>
+        </div>
+
+        <!-- 关于我面板 -->
+        <div class="content-panel" id="about">
+            <h1>关于我</h1>
+            <p>这里可以填写个人介绍、技能、经历等信息。</p>
+            <p>自定义文字、图片、标签都可以直接写在当前区域内。</p>
+        </div>
+
+        <!-- 项目展示面板 -->
+        <div class="content-panel" id="project">
+            <h1>项目展示</h1>
+            <p>存放你的项目介绍、链接、截图、使用说明。</p>
+            <p>示例：项目1 / 项目2 / 开源作品汇总</p>
+        </div>
+
+        <!-- 技术博客面板 -->
+        <div class="content-panel" id="blog">
+            <h1>技术博客</h1>
+            <p>记录学习笔记、技术心得、踩坑总结。</p>
+        </div>
+
+        <!-- 文件资源面板 -->
+        <div class="content-panel" id="file">
+            <h1>文件资源</h1>
+            <p>各类工具、文档、素材资源汇总。</p>
+        </div>
+
+        <!-- 联系我面板 -->
+        <div class="content-panel" id="contact">
+            <h1>联系我</h1>
+            <p>GitHub：xxx</p>
+            <p>邮箱：xxx@xxx.com</p>
+        </div>
     </div>
 
+    <script>
+        // 移动端侧边栏折叠
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+
+        // 导航切换内容逻辑
+        const navItems = document.querySelectorAll('.nav-item');
+        const panels = document.querySelectorAll('.content-panel');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有导航激活状态
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // 当前导航设为激活
+                this.classList.add('active');
+
+                // 获取目标面板ID
+                const targetId = this.getAttribute('data-target');
+                // 隐藏所有面板
+                panels.forEach(panel => panel.classList.remove('active'));
+                // 显示对应面板
+                document.getElementById(targetId).classList.add('active');
+
+                // 移动端点击导航后自动收起侧边栏（提升体验）
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
