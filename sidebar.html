@@ -1,0 +1,63 @@
+<!-- 侧边栏导航模块 -->
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #165DFF;
+    color: #fff;
+    padding: 30px 20px;
+    font-family: "Microsoft Yahei", sans-serif;
+    z-index: 999;
+}
+.sidebar h2 {
+    text-align: center;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar li {
+    margin: 8px 0;
+}
+.sidebar a {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    padding: 14px 18px;
+    border-radius: 8px;
+    transition: 0.25s;
+    cursor: pointer;
+}
+.sidebar a i {
+    margin-right: 12px;
+    font-size: 18px;
+}
+.sidebar a:hover {
+    background: rgba(255,255,255,0.15);
+    padding-left: 5px;
+}
+.sidebar a.active {
+    background: rgba(255,255,255,0.25);
+}
+</style>
+
+<div class="sidebar">
+    <h2>导航菜单</h2>
+    <ul>
+        <li><a class="nav-item active" data-target="home"><i class="fas fa-home"></i> 首页</a></li>
+        <li><a class="nav-item" data-target="about"><i class="fas fa-user"></i> 关于我</a></li>
+        <li><a class="nav-item" data-target="project"><i class="fas fa-code"></i> 项目展示</a></li>
+        <li><a class="nav-item" data-target="blog"><i class="fas fa-book"></i> 技术博客</a></li>
+        <li><a class="nav-item" data-target="file"><i class="fas fa-folder"></i> 文件资源</a></li>
+        <li><a class="nav-item" data-target="contact"><i class="fas fa-envelope"></i> 联系我</a></li>
+    </ul>
+</div>
