@@ -2,20 +2,201 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>模块化侧边栏页面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>摄像头调用系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        /* 整体布局：左侧导航 + 右侧内容 */
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* 左侧导航栏样式 */
+        .sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-title {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .nav-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            margin: 8px 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-align: left;
+        }
+
+        .nav-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .nav-btn.active {
+            background-color: #27ae60;
+        }
+
+        /* 右侧主内容区 */
+        .main-content {
+            flex: 1;
+            background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .content-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        /* 摄像头视频区域 */
+        #video {
+            width: 80%;
+            max-width: 700px;
+            height: auto;
+            background-color: #000;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            display: none; /* 默认隐藏 */
+        }
+
+        /* 操作按钮组 */
+        .control-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #startBtn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        #stopBtn {
+            background-color: #e74c3c;
+            color: white;
+            display: none; /* 默认隐藏 */
+        }
+
+        .control-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <h2 class="sidebar-title">功能导航</h2>
+            <button class="nav-btn active" id="cameraNav">摄像头功能</button>
+            <button class="nav-btn">首页</button>
+            <button class="nav-btn">设置</button>
+            <button class="nav-btn">帮助</button>
+        </div>
 
-<!-- 左侧导航模块 -->
-<link rel="html" href="sidebar.html">
-<object data="sidebar.html"></object>
+        <!-- 右侧主内容区 -->
+        <div class="main-content">
+            <h3 class="content-title">摄像头实时预览</h3>
+            <!-- 视频显示区域 -->
+            <video id="video" autoplay playsinline></video>
+            <!-- 操作按钮 -->
+            <div class="control-group">
+                <button class="control-btn" id="startBtn">开启摄像头</button>
+                <button class="control-btn" id="stopBtn">关闭摄像头</button>
+            </div>
+        </div>
+    </div>
 
-<!-- 右侧内容模块 -->
-<link rel="html" href="content.html">
-<object data="content.html"></object>
+    <script>
+        // 获取DOM元素
+        const video = document.getElementById('video');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const cameraNav = document.getElementById('cameraNav');
+        let mediaStream = null; // 存储摄像头流
 
-<!-- 交互逻辑 -->
-<script src="script.js"></script>
+        // 左侧导航栏按钮点击效果
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
 
+        // 1. 开启摄像头函数
+        async function startCamera() {
+            try {
+                // 调用设备摄像头（核心API）
+                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true,  // 开启视频
+                    audio: false  // 关闭音频
+                });
+                
+                // 将摄像头流赋值给video标签
+                video.srcObject = mediaStream;
+                video.style.display = 'block';
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'block';
+            } catch (err) {
+                alert(`摄像头调用失败：${err.message}\n请允许摄像头权限或检查设备！`);
+                console.error('摄像头错误：', err);
+            }
+        }
+
+        // 2. 关闭摄像头函数
+        function stopCamera() {
+            if(mediaStream) {
+                // 停止所有视频轨道
+                mediaStream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                video.style.display = 'none';
+                startBtn.style.display = 'block';
+                stopBtn.style.display = 'none';
+            }
+        }
+
+        // 绑定事件：点击左侧导航按钮 调用摄像头
+        cameraNav.addEventListener('click', startCamera);
+        // 绑定操作按钮事件
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+    </script>
 </body>
 </html>
