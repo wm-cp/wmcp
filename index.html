@@ -73,7 +73,25 @@
         .content-title {
             font-size: 24px;
             color: #2c3e50;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* 摄像头选择下拉框 */
+        .camera-select-container {
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 700px;
+            display: none; /* 默认隐藏 */
+        }
+
+        #cameraSelect {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            background-color: white;
         }
 
         /* 摄像头视频区域 */
@@ -134,8 +152,15 @@
         <!-- 右侧主内容区 -->
         <div class="main-content">
             <h3 class="content-title">摄像头实时预览</h3>
+            
+            <!-- 摄像头选择下拉框 -->
+            <div class="camera-select-container" id="cameraSelectContainer">
+                <select id="cameraSelect"></select>
+            </div>
+
             <!-- 视频显示区域 -->
             <video id="video" autoplay playsinline></video>
+            
             <!-- 操作按钮 -->
             <div class="control-group">
                 <button class="control-btn" id="startBtn">开启摄像头</button>
@@ -150,7 +175,11 @@
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const cameraNav = document.getElementById('cameraNav');
+        const cameraSelect = document.getElementById('cameraSelect');
+        const cameraSelectContainer = document.getElementById('cameraSelectContainer');
+        
         let mediaStream = null; // 存储摄像头流
+        let cameraDevices = []; // 存储所有摄像头设备
 
         // 左侧导航栏按钮点击效果
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -160,41 +189,97 @@
             });
         });
 
-        // 1. 开启摄像头函数
-        async function startCamera() {
+        // 获取所有摄像头设备列表
+        async function getCameraDevices() {
             try {
-                // 调用设备摄像头（核心API）
-                mediaStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true,  // 开启视频
-                    audio: false  // 关闭音频
+                // 必须先请求权限才能获取设备列表
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                
+                // 获取所有媒体设备
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                
+                // 筛选出视频设备（摄像头）
+                cameraDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                // 清空下拉框
+                cameraSelect.innerHTML = '';
+                
+                // 将摄像头添加到下拉框
+                cameraDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `摄像头 ${index + 1}`;
+                    cameraSelect.appendChild(option);
                 });
                 
-                // 将摄像头流赋值给video标签
+                return cameraDevices;
+            } catch (err) {
+                console.error('获取摄像头列表失败：', err);
+                return [];
+            }
+        }
+
+        // 根据选择的摄像头ID开启摄像头
+        async function startSelectedCamera(deviceId = null) {
+            try {
+                // 停止之前的摄像头
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
+
+                const constraints = {
+                    video: deviceId ? { deviceId: { exact: deviceId } } : true,
+                    audio: false
+                };
+
+                // 调用摄像头
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = mediaStream;
+
+                // 显示视频和关闭按钮，隐藏开启按钮
                 video.style.display = 'block';
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'block';
             } catch (err) {
-                alert(`摄像头调用失败：${err.message}\n请允许摄像头权限或检查设备！`);
+                alert(`摄像头调用失败：${err.message}`);
                 console.error('摄像头错误：', err);
             }
         }
 
-        // 2. 关闭摄像头函数
-        function stopCamera() {
-            if(mediaStream) {
-                // 停止所有视频轨道
-                mediaStream.getTracks().forEach(track => track.stop());
-                video.srcObject = null;
-                video.style.display = 'none';
-                startBtn.style.display = 'block';
-                stopBtn.style.display = 'none';
-            }
+        // 开启摄像头（主函数）
+        async function startCamera() {
+            // 先获取摄像头列表
+            await getCameraDevices();
+            
+            // 显示下拉选择框
+            cameraSelectContainer.style.display = 'block';
+            
+            // 启动默认摄像头
+            await startSelectedCamera();
         }
 
-        // 绑定事件：点击左侧导航按钮 调用摄像头
+        // 关闭摄像头
+        function stopCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            
+            // 隐藏视频和下拉框，显示开启按钮
+            video.style.display = 'none';
+            cameraSelectContainer.style.display = 'none';
+            startBtn.style.display = 'block';
+            stopBtn.style.display = 'none';
+        }
+
+        // 下拉框切换摄像头
+        cameraSelect.addEventListener('change', async () => {
+            const selectedDeviceId = cameraSelect.value;
+            await startSelectedCamera(selectedDeviceId);
+        });
+
+        // 绑定事件
         cameraNav.addEventListener('click', startCamera);
-        // 绑定操作按钮事件
         startBtn.addEventListener('click', startCamera);
         stopBtn.addEventListener('click', stopCamera);
     </script>
