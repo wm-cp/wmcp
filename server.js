@@ -9,9 +9,9 @@ app.use(express.static(__dirname));
 // MySQL 配置（改成你自己的）
 const dbConfig = {
   host: 'localhost',
-  user: 'root',
-  password: '123456',
-  database: 'user_system',
+  user: '174623',
+  password: '174623',
+  database: 'users',
   port: 3306
 };
 
@@ -74,7 +74,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = 3306;
 app.listen(PORT, () => {
   console.log(`服务已启动：http://localhost:${PORT}`);
 });
