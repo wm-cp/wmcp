@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>账号注册</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+    .container{width:400px;margin:80px auto;padding:30px;border:1px solid #ddd;border-radius:8px}
+    h2{text-align:center;margin-bottom:20px}
+    .input-group{margin-bottom:15px}
+    input{width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:16px}
+    button{width:100%;padding:10px;background:#409eff;color:white;border:none;border-radius:4px;font-size:16px;cursor:pointer}
+    .link{text-align:center;margin-top:15px}
+    .msg{color:red;text-align:center;margin-bottom:10px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>账号注册</h2>
+    <div id="msg" class="msg"></div>
+    <div class="input-group">
+      <input type="text" id="username" placeholder="账号（不允许特殊字符）">
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="请输入密码">
+    </div>
+    <button onclick="register()">注册</button>
+    <div class="link">已有账号？<a href="index.html">立即登录</a></div>
+  </div>
+
+  <script>
+    async function register() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const msg = document.getElementById('msg');
+
+      if(!username || !password){
+        msg.textContent = '请填写完整信息';
+        return;
+      }
+
+      // 前端提前校验特殊字符
+      const specialReg = /[^\u4e00-\u9fa5a-zA-Z0-9]/;
+      if(specialReg.test(username)){
+        msg.textContent = '账号不允许包含特殊字符！';
+        return;
+      }
+
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({username,password})
+      });
+      const data = await res.json();
+      msg.textContent = data.msg;
+      if(data.code === 1) setTimeout(()=>location.href='index.html',1000);
+    }
+  </script>
+</body>
+</html>
