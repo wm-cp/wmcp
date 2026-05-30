@@ -1,418 +1,53 @@
-<!-- 文档声明：HTML5 标准文档 -->
 <!DOCTYPE html>
-<!-- 网页根标签，指定语言为中文 -->
 <html lang="zh-CN">
-<!-- 头部区域：配置网页元信息、样式 -->
 <head>
-    <!-- 字符编码：设置为 UTF-8，防止中文乱码 -->
-    <meta charset="UTF-8">
-    <!-- 视口适配：兼容手机、平板等移动端，禁止缩放 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 网页标题，浏览器标签显示文字 -->
-    <title>摄像头调用系统</title>
-    <!-- 内嵌样式表，编写页面所有CSS样式 -->
-    <style>
-        /* 全局选择器：匹配页面所有元素 */
-        * {
-            /* 清除元素默认外边距 */
-            margin: 0;
-            /* 清除元素默认内边距 */
-            padding: 0;
-            /* 标准盒模型：宽高包含内边距和边框 */
-            box-sizing: border-box;
-            /* 设置全局字体 */
-            font-family: "Microsoft YaHei", sans-serif;
-        }
-
-        /* 最外层容器：整体布局容器 */
-        .container {
-            /* 弹性布局：实现左右分栏 */
-            display: flex;
-            /* 高度占满整个浏览器视口高度 */
-            height: 100vh;
-            /* 宽度占满整个浏览器视口宽度 */
-            width: 100vw;
-        }
-
-        /* 左侧导航栏容器样式 */
-        .sidebar {
-            /* 固定导航栏宽度 */
-            width: 320px;
-            /* 导航栏背景色 */
-            background-color: #2c3e50;
-            /* 文字颜色设为白色 */
-            color: white;
-            /* 上下内边距 */
-            padding: 20px 0;
-            /* 内部元素垂直排列 */
-            display: flex;
-            /* 弹性布局方向：纵向 */
-            flex-direction: column;
-            /* 右侧阴影，增强立体感 */
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-
-        /* 导航栏标题样式 */
-        .sidebar-title {
-            /* 文字水平居中 */
-            text-align: center;
-            /* 文字字号 */
-            font-size: 20px;
-            /* 底部外边距 */
-            margin-bottom: 30px;
-            /* 底部内边距 */
-            padding-bottom: 15px;
-            /* 底部分割线 */
-            border-bottom: 1px solid #34495e;
-        }
-
-        /* 导航栏按钮通用样式 */
-        .nav-btn {
-            /* 按钮背景色 */
-            background-color: #3498db;
-            /* 按钮文字颜色 */
-            color: white;
-            /* 取消按钮默认边框 */
-            border: none;
-            /* 按钮上下、左右内边距 */
-            padding: 14px 20px;
-            /* 按钮上下、左右外边距 */
-            margin: 8px 15px;
-            /* 按钮圆角 */
-            border-radius: 6px;
-            /* 按钮文字大小 */
-            font-size: 16px;
-            /* 鼠标悬浮变为手型指针 */
-            cursor: pointer;
-            /* 过渡动画：背景色变化平滑过渡 0.3秒 */
-            transition: background 0.3s;
-            /* 按钮文字左对齐 */
-            text-align: left;
-        }
-
-        /* 导航按钮鼠标悬浮样式 */
-        .nav-btn:hover {
-            /* 悬浮时切换背景色 */
-            background-color: #2980b9;
-        }
-
-        /* 导航按钮选中激活样式 */
-        .nav-btn.active {
-            /* 选中状态背景色 */
-            background-color: #27ae60;
-        }
-
-        /* 右侧主内容区域容器 */
-        .main-content {
-            /* 自动占满剩余宽度 */
-            flex: 1;
-            /* 内容区背景色 */
-            background-color: #f5f7fa;
-            /* 内部元素弹性布局 */
-            display: flex;
-            /* 内部元素纵向排列 */
-            flex-direction: column;
-            /* 内部元素水平居中 */
-            align-items: center;
-            /* 内部元素垂直居中 */
-            justify-content: center;
-            /* 整体内边距 */
-            padding: 20px;
-        }
-
-        /* 内容区标题样式 */
-        .content-title {
-            /* 文字字号 */
-            font-size: 24px;
-            /* 文字颜色 */
-            color: #2c3e50;
-            /* 底部外边距 */
-            margin-bottom: 20px;
-        }
-
-        /* 摄像头下拉选择框外层容器 */
-        .camera-select-container {
-            /* 底部外边距 */
-            margin-bottom: 20px;
-            /* 宽度占父容器80% */
-            width: 80%;
-            /* 最大宽度限制，防止过大 */
-            max-width: 700px;
-            /* 默认隐藏下拉框 */
-            display: none;
-        }
-
-        /* 下拉选择框样式 */
-        #cameraSelect {
-            /* 宽度100%填满父容器 */
-            width: 100%;
-            /* 上下、左右内边距 */
-            padding: 12px 15px;
-            /* 文字大小 */
-            font-size: 16px;
-            /* 边框样式 */
-            border: 1px solid #ddd;
-            /* 圆角 */
-            border-radius: 6px;
-            /* 取消选中时默认外边框 */
-            outline: none;
-            /* 下拉框背景白色 */
-            background-color: white;
-        }
-
-        /* 视频播放标签样式 */
-        #video {
-            /* 宽度占父容器80% */
-            width: 80%;
-            /* 最大宽度限制 */
-            max-width: 700px;
-            /* 高度自适应 */
-            height: auto;
-            /* 视频区域默认黑色背景 */
-            background-color: #000;
-            /* 圆角 */
-            border-radius: 10px;
-            /* 整体阴影 */
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            /* 底部外边距 */
-            margin-bottom: 25px;
-            /* 默认隐藏视频画面 */
-            display: none;
-        }
-
-        /* 底部按钮组容器 */
-        .control-group {
-            /* 弹性布局横向排列 */
-            display: flex;
-            /* 按钮之间间距 */
-            gap: 15px;
-        }
-
-        /* 功能按钮通用样式 */
-        .control-btn {
-            /* 上下、左右内边距 */
-            padding: 12px 30px;
-            /* 文字大小 */
-            font-size: 16px;
-            /* 取消默认边框 */
-            border: none;
-            /* 按钮圆角 */
-            border-radius: 6px;
-            /* 鼠标手型指针 */
-            cursor: pointer;
-            /* 所有属性变化开启0.3秒过渡动画 */
-            transition: 0.3s;
-        }
-
-        /* 开启摄像头按钮样式 */
-        #startBtn {
-            /* 背景色绿色 */
-            background-color: #27ae60;
-            /* 文字白色 */
-            color: white;
-        }
-
-        /* 关闭摄像头按钮样式 */
-        #stopBtn {
-            /* 背景色红色 */
-            background-color: #e74c3c;
-            /* 文字白色 */
-            color: white;
-            /* 默认隐藏关闭按钮 */
-            display: none;
-        }
-
-        /* 功能按钮悬浮效果 */
-        .control-btn:hover {
-            /* 透明度略微降低 */
-            opacity: 0.9;
-            /* 轻微放大按钮 */
-            transform: scale(1.05);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>用户登录</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+    .container{width:400px;margin:80px auto;padding:30px;border:1px solid #ddd;border-radius:8px}
+    h2{text-align:center;margin-bottom:20px}
+    .input-group{margin-bottom:15px}
+    input{width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:16px}
+    button{width:100%;padding:10px;background:#409eff;color:white;border:none;border-radius:4px;font-size:16px;cursor:pointer}
+    .link{text-align:center;margin-top:15px}
+    .msg{color:red;text-align:center;margin-bottom:10px}
+  </style>
 </head>
-<!-- 网页主体区域：页面可见内容全部写在这里 -->
 <body>
-    <!-- 整体布局容器 -->
-    <div class="container">
-        <!-- 左侧导航栏区域 -->
-        <div class="sidebar">
-            <!-- 导航栏标题 -->
-            <h2 class="sidebar-title">功能导航</h2>
-            <!-- 导航按钮：摄像头功能，默认选中状态 -->
-            <button class="nav-btn active" id="cameraNav">摄像头功能</button>
-            <!-- 导航按钮：首页 -->
-            <button class="nav-btn">首页</button>
-            <!-- 导航按钮：设置 -->
-            <button class="nav-btn">设置</button>
-            <!-- 导航按钮：帮助 -->
-            <button class="nav-btn">帮助</button>
-        </div>
-
-        <!-- 右侧主内容区域 -->
-        <div class="main-content">
-            <!-- 内容区标题 -->
-            <h3 class="content-title">摄像头实时预览</h3>
-            
-            <!-- 摄像头下拉选择框容器 -->
-            <div class="camera-select-container" id="cameraSelectContainer">
-                <!-- 下拉选择标签，用于切换摄像头 -->
-                <select id="cameraSelect"></select>
-            </div>
-
-            <!-- 视频播放标签：autoplay自动播放，playsinline兼容移动端内联播放 -->
-            <video id="video" autoplay playsinline></video>
-            
-            <!-- 按钮组容器 -->
-            <div class="control-group">
-                <!-- 开启摄像头按钮 -->
-                <button class="control-btn" id="startBtn">开启摄像头</button>
-                <!-- 关闭摄像头按钮 -->
-                <button class="control-btn" id="stopBtn">关闭摄像头</button>
-            </div>
-        </div>
+  <div class="container">
+    <h2>用户登录</h2>
+    <div id="msg" class="msg"></div>
+    <div class="input-group">
+      <input type="text" id="username" placeholder="请输入账号">
     </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="请输入密码">
+    </div>
+    <button onclick="login()">登录</button>
+    <div class="link">没有账号？<a href="register.html">立即注册</a></div>
+  </div>
 
-    <!-- JS脚本区域：实现页面交互、摄像头调用逻辑 -->
-    <script>
-        // 获取页面中video视频标签DOM对象
-        const video = document.getElementById('video');
-        // 获取【开启摄像头】按钮DOM对象
-        const startBtn = document.getElementById('startBtn');
-        // 获取【关闭摄像头】按钮DOM对象
-        const stopBtn = document.getElementById('stopBtn');
-        // 获取左侧导航【摄像头功能】按钮DOM对象
-        const cameraNav = document.getElementById('cameraNav');
-        // 获取摄像头下拉选择框DOM对象
-        const cameraSelect = document.getElementById('cameraSelect');
-        // 获取下拉框外层容器DOM对象
-        const cameraSelectContainer = document.getElementById('cameraSelectContainer');
+  <script>
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const msg = document.getElementById('msg');
 
-        // 全局变量：存储摄像头视频流对象
-        let mediaStream = null;
-        // 全局数组：存储检测到的所有摄像头设备信息
-        let cameraDevices = [];
+      if(!username || !password){
+        msg.textContent = '请输入账号和密码';
+        return;
+      }
 
-        // 遍历所有导航按钮，绑定点击切换选中样式事件
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            // 给每个导航按钮添加点击监听
-            btn.addEventListener('click', () => {
-                // 遍历所有导航按钮，移除全部选中样式
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                // 给当前点击的按钮添加选中样式
-                btn.classList.add('active');
-            });
-        });
-
-        // 异步函数：获取当前设备所有摄像头设备列表
-        async function getCameraDevices() {
-            // 异常捕获，防止权限拒绝、设备异常报错
-            try {
-                // 先申请摄像头临时权限，浏览器规则：无权限无法枚举设备
-                await navigator.mediaDevices.getUserMedia({ video: true });
-                // 枚举当前设备所有音视频媒体设备
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                // 过滤设备列表，只保留摄像头设备(videoinput)
-                cameraDevices = devices.filter(device => device.kind === 'videoinput');
-                // 清空下拉选择框原有选项
-                cameraSelect.innerHTML = '';
-                // 遍历摄像头数组，动态生成下拉选项
-                cameraDevices.forEach((device, index) => {
-                    // 创建下拉选项元素option
-                    const option = document.createElement('option');
-                    // 将摄像头唯一设备ID赋值给选项value
-                    option.value = device.deviceId;
-                    // 设置选项显示文字：有设备名则用原名，无则自定义名称
-                    option.text = device.label || `摄像头 ${index + 1}`;
-                    // 将选项添加到下拉框中
-                    cameraSelect.appendChild(option);
-                });
-                // 返回摄像头设备列表
-                return cameraDevices;
-            } catch (err) {
-                // 在控制台打印错误信息
-                console.error('获取摄像头列表失败：', err);
-                // 异常时返回空数组
-                return [];
-            }
-        }
-
-        // 异步函数：根据传入的设备ID启动指定摄像头
-        async function startSelectedCamera(deviceId = null) {
-            // 异常捕获
-            try {
-                // 如果当前已有摄像头在运行，先停止所有视频轨道
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                }
-                // 定义媒体设备调用参数
-                const constraints = {
-                    // 指定视频设备：有ID则精准调用对应摄像头，无ID调用默认摄像头
-                    video: deviceId ? { deviceId: { exact: deviceId } } : true,
-                    // 关闭音频（麦克风）
-                    audio: false
-                };
-                // 调用浏览器媒体接口，获取摄像头视频流
-                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                // 将视频流绑定到video标签进行播放
-                video.srcObject = mediaStream;
-                // 显示视频画面
-                video.style.display = 'block';
-                // 隐藏【开启摄像头】按钮
-                startBtn.style.display = 'none';
-                // 显示【关闭摄像头】按钮
-                stopBtn.style.display = 'block';
-            } catch (err) {
-                // 弹出错误提示框
-                alert(`摄像头调用失败：${err.message}`);
-                // 控制台打印错误详情
-                console.error('摄像头错误：', err);
-            }
-        }
-
-        // 异步主函数：开启摄像头整体流程
-        async function startCamera() {
-            // 先加载并获取摄像头设备列表
-            await getCameraDevices();
-            // 显示摄像头下拉选择框
-            cameraSelectContainer.style.display = 'block';
-            // 启动默认摄像头
-            await startSelectedCamera();
-        }
-
-        // 函数：关闭摄像头，恢复页面初始状态
-        function stopCamera() {
-            // 判断视频流是否存在
-            if (mediaStream) {
-                // 停止视频流所有轨道
-                mediaStream.getTracks().forEach(track => track.stop());
-                // 清空video标签的视频流
-                video.srcObject = null;
-            }
-            // 隐藏视频画面
-            video.style.display = 'none';
-            // 隐藏摄像头下拉选择框
-            cameraSelectContainer.style.display = 'none';
-            // 显示【开启摄像头】按钮
-            startBtn.style.display = 'block';
-            // 隐藏【关闭摄像头】按钮
-            stopBtn.style.display = 'none';
-        }
-
-        // 给下拉选择框绑定切换事件
-        cameraSelect.addEventListener('change', async () => {
-            // 获取当前选中项的摄像头设备ID
-            const selectedDeviceId = cameraSelect.value;
-            // 切换到选中的摄像头
-            await startSelectedCamera(selectedDeviceId);
-        });
-
-        // 左侧导航【摄像头功能】按钮点击事件：开启摄像头
-        cameraNav.addEventListener('click', startCamera);
-        // 【开启摄像头】按钮点击事件
-        startBtn.addEventListener('click', startCamera);
-        // 【关闭摄像头】按钮点击事件
-        stopBtn.addEventListener('click', stopCamera);
-    </script>
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({username,password})
+      });
+      const data = await res.json();
+      msg.textContent = data.msg;
+      if(data.code === 1) setTimeout(()=>location.href='/',1000);
+    }
+  </script>
 </body>
 </html>
